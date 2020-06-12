@@ -7,4 +7,4 @@ print `ifconfig`;
 
 ?>
 </pre>
-<img src='webserver-bucket-terr.s3.ap-south-1.amazonaws.com/image1' />
+<img src='d3j6yl9u954vsm.cloudfront.net' />
