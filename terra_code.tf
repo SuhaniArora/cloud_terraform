@@ -51,7 +51,7 @@ resource "aws_instance" "web" {
   connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("C:/Users/Suhani/Desktop/aws/redhat1_key.pem")
+    private_key = file("/root/terraform/redhat1_key.pem")
     host     = aws_instance.web.public_ip
   }
 
@@ -101,7 +101,7 @@ depends_on = [
   connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("C:/Users/Suhani/Desktop/aws/redhat1_key.pem")
+    private_key = file("/root/terraform/redhat1_key.pem")
     host     = aws_instance.web.public_ip
   }
 
@@ -134,8 +134,7 @@ resource "aws_s3_bucket_object" "s3_object" {
   bucket = aws_s3_bucket.b.id
   key    = "image1"
   acl    = "public-read"
-  source = "C:/Users/Suhani/Desktop/aws/img1_s3.png"
-  etag   = filemd5("C:/Users/Suhani/Desktop/aws/img1_s3.png")
+  source = "/root/terraform/img1_s3.png"
 }
 
 resource "null_resource" "url_file"  {
@@ -204,7 +203,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("C:/Users/Suhani/Desktop/aws/redhat1_key.pem")
+    private_key = file("/root/terraform/redhat1_key.pem")
     host     = aws_instance.web.public_ip
   }
 
