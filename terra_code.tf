@@ -3,13 +3,16 @@ provider "aws" {
   region  = "ap-south-1"
 }
 
-variable "key_name" {}
+variable "key_name" { default = "key1" }
 resource "tls_private_key" "example" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "generated_key" {
+  depends_on = [
+    tls_private_key.example
+  ]
   key_name   = "${var.key_name}"
   public_key = "${tls_private_key.example.public_key_openssh}"
 }
@@ -17,6 +20,7 @@ resource "aws_key_pair" "generated_key" {
 resource "aws_security_group" "allow_tls" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
+  vpc_id = "vpc-6619060e"
 
   ingress {
     description = "TLS from VPC"
@@ -57,12 +61,12 @@ resource "aws_security_group" "allow_tls" {
 resource "aws_instance" "web" {
   ami             = "ami-0447a12f28fddb066"
   instance_type   = "t2.micro"
-  key_name        = "${aws_key_pair.generated_key.key_name}"
-  security_groups = [ "${aws_security_group.allow_tls.name}"]
+  key_name        = aws_key_pair.generated_key.key_name
+  security_groups = [ "${aws_security_group.allow_tls.name}" ]
   connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("/root/terraform/redhat1_key.pem")
+    private_key = tls_private_key.example.private_key_pem
     host     = aws_instance.web.public_ip
   }
 
@@ -112,7 +116,7 @@ depends_on = [
   connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("/root/terraform/redhat1_key.pem")
+    private_key = tls_private_key.example.private_key_pem
     host     = aws_instance.web.public_ip
   }
 
@@ -162,7 +166,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = "${aws_s3_bucket.b.bucket_regional_domain_name}"
     origin_id   = "S3-webserver-bucket-terr"
-    //origin_path = "image1"
 
     s3_origin_config {
       origin_access_identity = "${aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path}"
@@ -214,7 +217,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   connection {
     type     = "ssh"
     user     = "ec2-user"
-    private_key = file("/root/terraform/redhat1_key.pem")
+    private_key = tls_private_key.example.private_key_pem
     host     = aws_instance.web.public_ip
   }
 
