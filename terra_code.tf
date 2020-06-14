@@ -3,6 +3,17 @@ provider "aws" {
   region  = "ap-south-1"
 }
 
+variable "key_name" {}
+resource "tls_private_key" "example" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "generated_key" {
+  key_name   = "${var.key_name}"
+  public_key = "${tls_private_key.example.public_key_openssh}"
+}
+
 resource "aws_security_group" "allow_tls" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
@@ -46,8 +57,8 @@ resource "aws_security_group" "allow_tls" {
 resource "aws_instance" "web" {
   ami             = "ami-0447a12f28fddb066"
   instance_type   = "t2.micro"
-  key_name        = "redhat1_key"
-  security_groups = ["launch-wizard-3"]
+  key_name        = "${aws_key_pair.generated_key.key_name}"
+  security_groups = [ "${aws_security_group.allow_tls.name}"]
   connection {
     type     = "ssh"
     user     = "ec2-user"
