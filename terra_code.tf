@@ -100,12 +100,6 @@ resource "aws_volume_attachment" "ebs_att" {
   force_detach= true  
 }
 
-resource "null_resource" "ip_file"  {
-	provisioner "local-exec" {
-	    command = "echo  ${aws_instance.web.public_ip} > publicip.txt"
-  	}
-}
-
 resource "null_resource" "git_code"  {
 
 depends_on = [
@@ -149,12 +143,6 @@ resource "aws_s3_bucket_object" "s3_object" {
   key    = "image1"
   acl    = "public-read"
   source = "/root/terraform/img1_s3.png"
-}
-
-resource "null_resource" "url_file"  {
-  provisioner "local-exec" {
-    command = "echo  ${aws_s3_bucket.b.bucket_regional_domain_name}/${aws_s3_bucket_object.s3_object.id} > s3_url.txt"
-  }
 }
 
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
@@ -222,7 +210,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     inline = [
       "sudo chmod +x /tmp/script.sh",
       "sudo su << EOF" ,
-      "echo \"<img src='http://${self.domain_name}/$aws_s3_bucket_object.s3_object.key}' height='200px' width='200px'>\" >> /var/www/html/index.php",
+      "echo \"<img src='http://${self.domain_name}/${aws_s3_bucket_object.s3_object.key}' height='200px' width='200px'>\" >> /var/www/html/index.php",
       "EOF" 
     ]
   }  
