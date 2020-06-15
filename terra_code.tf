@@ -132,7 +132,6 @@ depends_on = [
 
 resource "aws_s3_bucket" "b" {
   bucket = "webserver-bucket-terr"
-  acl    = "public-read"
   region = "ap-south-1"
   force_destroy = true
   tags = {
@@ -175,8 +174,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "image1"
- 
-  //aliases = ["mysite.example.com"]
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
