@@ -77,22 +77,6 @@ resource "aws_instance" "web" {
   }
 }
 
-/*resource "aws_ebs_volume" "web_vol" {
-  availability_zone = aws_instance.web.availability_zone
-  size              = 1
-
-  tags = {
-    Name = "webserver_vol"
-  }
-}
-
-resource "aws_volume_attachment" "ebs_att" {
-  device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.web_vol.id
-  instance_id = aws_instance.web.id
-  force_detach= true  
-}*/
-
 resource "aws_efs_file_system" "web_vol" {
   creation_token = "webserver-efs-file-system"
 
